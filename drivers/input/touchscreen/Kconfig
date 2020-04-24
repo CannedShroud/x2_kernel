@@ -1296,4 +1296,8 @@ config TOUCHSCREEN_RAYDIUM_CHIPSET
 
 	  If unsure, say N.
 
+#ifdef VENDOR_EDIT
+#bajrang.patidar@BSP.TP 2019-08-19 add for enable tp function
+source "drivers/input/touchscreen/oppo_touchscreen/Kconfig"
+#endif
 endif
