@@ -415,6 +415,14 @@ static bool geni_wait_for_cmd_done(struct uart_port *uport, bool is_irq_masked)
 	return timeout ? 0 : 1;
 }
 
+#ifdef VENDOR_EDIT
+bool boot_with_console(void)
+{
+	return true;
+}
+EXPORT_SYMBOL(boot_with_console);
+#endif
+
 static void msm_geni_serial_config_port(struct uart_port *uport, int cfg_flags)
 {
 	if (cfg_flags & UART_CONFIG_TYPE)
