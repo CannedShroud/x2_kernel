@@ -23,14 +23,6 @@
 #include <linux/sched/task.h>
 #include <linux/async.h>
 
-#ifdef VENDOR_EDIT //Fanhong.Kong@PSW.BSP.CHG,add 2017/10/10 for O mini dump
-#include <linux/uaccess.h>
-#include <asm-generic/irq_regs.h>
-#include <linux/irq.h>
-#include <linux/percpu.h>
-#include <soc/qcom/memory_dump.h>
-#endif/*VENDOR_EDIT*/
-
 static void __init register_log_buf(void)
 {
 	char **log_bufp;
@@ -374,9 +366,6 @@ static int __init msm_minidump_log_init(void)
 {
 	register_kernel_sections();
 	register_log_buf();
-#ifdef VENDOR_EDIT //yixue.ge@bsp.drv add for dump cpu contex for minidump
-	register_cpu_contex();
-#endif
 	return 0;
 }
 
