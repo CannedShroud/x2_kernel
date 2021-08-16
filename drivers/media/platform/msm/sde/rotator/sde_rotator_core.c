@@ -3144,6 +3144,19 @@ int sde_rotator_core_init(struct sde_rot_mgr **pmgr,
 		if (IS_SDE_MAJOR_SAME(mdata->mdss_version,
 			SDE_MDP_HW_REV_500))
 			mgr->max_rot_clk = ROT_R3_MAX_ROT_CLK;
+		if (IS_SDE_MAJOR_MINOR_SAME(mdata->mdss_version,
+				SDE_MDP_HW_REV_500) ||
+		IS_SDE_MAJOR_MINOR_SAME(mdata->mdss_version,
+				SDE_MDP_HW_REV_620))
+			mgr->max_rot_clk = 460000000UL;
+		else if (IS_SDE_MAJOR_MINOR_SAME(mdata->mdss_version,
+					SDE_MDP_HW_REV_520))
+			mgr->max_rot_clk = 430000000UL;
+		else if (IS_SDE_MAJOR_MINOR_SAME(mdata->mdss_version,
+				SDE_MDP_HW_REV_530) ||
+			IS_SDE_MAJOR_MINOR_SAME(mdata->mdss_version,
+				SDE_MDP_HW_REV_540))
+			mgr->max_rot_clk = 307200000UL;
 
 		if (!IS_SDE_MAJOR_SAME(mdata->mdss_version,
 					SDE_MDP_HW_REV_500) &&

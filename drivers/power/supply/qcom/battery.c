@@ -48,6 +48,8 @@
 #define ICL_LIMIT_VOTER			"ICL_LIMIT_VOTER"
 #define FCC_STEPPER_VOTER		"FCC_STEPPER_VOTER"
 #define FCC_VOTER			"FCC_VOTER"
+#define MAIN_FCC_VOTER			"MAIN_FCC_VOTER"
+#define PD_VOTER			"PD_VOTER"
 
 struct pl_data {
 	int			pl_mode;
@@ -151,12 +153,97 @@ static bool cp_ilim_boost_enabled(struct pl_data *chip)
 	if (is_cp_available(chip))
 		power_supply_get_property(chip->cp_master_psy,
 				POWER_SUPPLY_PROP_PARALLEL_OUTPUT_MODE, &pval);
-
 	return pval.intval == POWER_SUPPLY_PL_OUTPUT_VPH;
+		break;
+	default:
+		pr_err("Invalid mode request %d\n", mode);
+		break;
+	}
+
+	if (rc < 0)
+		pr_err("Failed to read CP topology for mode=%d rc=%d\n",
+				mode, rc);
+
+	return pval.intval;
+}
+
+static int get_adapter_icl_based_ilim(struct pl_data *chip)
+{
+	int main_icl = -EINVAL, adapter_icl = -EINVAL, final_icl = -EINVAL;
+	int rc = -EINVAL;
+	union power_supply_propval pval = {0, };
+
+	rc = power_supply_get_property(chip->usb_psy,
+			POWER_SUPPLY_PROP_PD_ACTIVE, &pval);
+	if (rc < 0)
+		pr_err("Failed to read PD_ACTIVE status rc=%d\n",
+				rc);
+	/* Check for QC 3, 3.5 and PPS adapters, return if its none of them */
+	if (chip->charger_type != POWER_SUPPLY_TYPE_USB_HVDCP_3 &&
+		chip->charger_type != POWER_SUPPLY_TYPE_USB_HVDCP_3P5 &&
+		pval.intval != POWER_SUPPLY_PD_PPS_ACTIVE)
+		return final_icl;
+
+	/*
+	 * For HVDCP3/HVDCP_3P5 adapters, limit max. ILIM as:
+	 * HVDCP3_ICL: Maximum ICL of HVDCP3 adapter(from DT
+	 * configuration).
+	 *
+	 * For PPS adapters, limit max. ILIM to
+	 * MIN(qc4_max_icl, PD_CURRENT_MAX)
+	 */
+	if (pval.intval == POWER_SUPPLY_PD_PPS_ACTIVE) {
+		adapter_icl = min_t(int, chip->chg_param->qc4_max_icl_ua,
+				get_client_vote_locked(chip->usb_icl_votable,
+				PD_VOTER));
+		if (adapter_icl <= 0)
+			adapter_icl = chip->chg_param->qc4_max_icl_ua;
+	} else {
+		adapter_icl = chip->chg_param->hvdcp3_max_icl_ua;
+	}
+
+	/*
+	 * For Parallel input configurations:
+	 * VBUS: final_icl = adapter_icl - main_ICL
+	 * VMID: final_icl = adapter_icl
+	 */
+	final_icl = adapter_icl;
+	if (cp_get_parallel_mode(chip, PARALLEL_INPUT_MODE)
+					== POWER_SUPPLY_PL_USBIN_USBIN) {
+		main_icl = get_effective_result_locked(chip->usb_icl_votable);
+		if ((main_icl >= 0) && (main_icl < adapter_icl))
+			final_icl = adapter_icl - main_icl;
+	}
+
+	pr_debug("charger_type=%d final_icl=%d adapter_icl=%d main_icl=%d\n",
+		chip->charger_type, final_icl, adapter_icl, main_icl);
+
+	return final_icl;
 }
 
 static void cp_configure_ilim(struct pl_data *chip, const char *voter, int ilim)
 {
+	int rc, fcc, target_icl;
+	union power_supply_propval pval = {0, };
+
+	if (!is_usb_available(chip))
+		return;
+
+	if (!is_cp_available(chip))
+		return;
+
+	if (cp_get_parallel_mode(chip, PARALLEL_OUTPUT_MODE)
+					== POWER_SUPPLY_PL_OUTPUT_VPH)
+		return;
+
+	target_icl = get_adapter_icl_based_ilim(chip);
+	ilim = (target_icl > 0) ? min(ilim, target_icl) : ilim;
+
+	rc = power_supply_get_property(chip->cp_master_psy,
+				POWER_SUPPLY_PROP_MIN_ICL, &pval);
+	if (rc < 0)
+		return;
+
 	if (!chip->cp_ilim_votable)
 		chip->cp_ilim_votable = find_votable("CP_ILIM");
 
@@ -584,6 +671,20 @@ static void get_fcc_stepper_params(struct pl_data *chip, int main_fcc_ua,
 				chip->slave_fcc_ua) / FCC_STEP_SIZE_UA);
 	chip->parallel_step_fcc_residual = (parallel_fcc_ua -
 				chip->slave_fcc_ua) % FCC_STEP_SIZE_UA;
+
+		target_icl = get_adapter_icl_based_ilim(chip) * 2;
+		total_fcc_ua -= chip->main_fcc_ua;
+
+		/*
+		 * CP_ILIM = parallel_fcc_ua / 2.
+		 * Calculate parallel_fcc_ua as follows:
+		 * parallel_fcc_ua is based minimum of total FCC
+		 * or adapter's maximum allowed ICL limitation(if adapter
+		 * has max. ICL limitations).
+		 */
+		parallel_fcc_ua = (target_icl > 0) ?
+				min(target_icl, total_fcc_ua) : total_fcc_ua;
+	}
 
 	if (chip->parallel_step_fcc_count || chip->parallel_step_fcc_residual
 		|| chip->main_step_fcc_count || chip->main_step_fcc_residual)
