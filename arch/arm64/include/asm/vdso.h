@@ -34,6 +34,8 @@
 	(void *)(vdso_offset_##name - VDSO_LBASE + (unsigned long)(base)); \
 })
 
+#define vdso_offset_sigtramp 0x04e0
+
 #endif /* !__ASSEMBLY__ */
 
 #endif /* __KERNEL__ */
