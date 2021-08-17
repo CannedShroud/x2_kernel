@@ -49,7 +49,7 @@ $(obj)/vdso.o : $(obj)/vdso.so
 
 # Link rule for the .so file, .lds has to be first
 $(obj)/vdso.so.dbg: $(src)/vdso.lds $(obj-vdso)
-	$(call if_changed,vdsold)
+$(call if_changed,vdsold)
 
 # Strip rule for the .so file
 $(obj)/%.so: OBJCOPYFLAGS := -S
