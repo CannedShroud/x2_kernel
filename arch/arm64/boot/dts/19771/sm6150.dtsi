@@ -60,7 +60,7 @@
 			compatible = "arm,armv8";
 			reg = <0x0 0x0>;
 			enable-method = "psci";
-			capacity-dmips-mhz = <1024>;
+			capacity-dmips-mhz = <488>;
 			sched-energy-costs = <&CPU_COST_0 &CLUSTER_COST_0>;
 			cache-size = <0x8000>;
 			next-level-cache = <&L2_0>;
@@ -99,7 +99,7 @@
 			compatible = "arm,armv8";
 			reg = <0x0 0x100>;
 			enable-method = "psci";
-			capacity-dmips-mhz = <1024>;
+			capacity-dmips-mhz = <488>;
 			sched-energy-costs = <&CPU_COST_0 &CLUSTER_COST_0>;
 			cache-size = <0x8000>;
 			next-level-cache = <&L2_100>;
@@ -133,7 +133,7 @@
 			compatible = "arm,armv8";
 			reg = <0x0 0x200>;
 			enable-method = "psci";
-			capacity-dmips-mhz = <1024>;
+			capacity-dmips-mhz = <488>;
 			sched-energy-costs = <&CPU_COST_0 &CLUSTER_COST_0>;
 			cache-size = <0x8000>;
 			next-level-cache = <&L2_200>;
@@ -166,7 +166,7 @@
 			compatible = "arm,armv8";
 			reg = <0x0 0x300>;
 			enable-method = "psci";
-			capacity-dmips-mhz = <1024>;
+			capacity-dmips-mhz = <488>;
 			sched-energy-costs = <&CPU_COST_0 &CLUSTER_COST_0>;
 			cache-size = <0x8000>;
 			next-level-cache = <&L2_300>;
@@ -199,7 +199,7 @@
 			compatible = "arm,armv8";
 			reg = <0x0 0x400>;
 			enable-method = "psci";
-			capacity-dmips-mhz = <1024>;
+			capacity-dmips-mhz = <488>;
 			sched-energy-costs = <&CPU_COST_0 &CLUSTER_COST_0>;
 			cache-size = <0x8000>;
 			next-level-cache = <&L2_400>;
@@ -232,7 +232,7 @@
 			compatible = "arm,armv8";
 			reg = <0x0 0x500>;
 			enable-method = "psci";
-			capacity-dmips-mhz = <1024>;
+			capacity-dmips-mhz = <488>;
 			sched-energy-costs = <&CPU_COST_0 &CLUSTER_COST_0>;
 			cache-size = <0x8000>;
 			next-level-cache = <&L2_500>;
@@ -265,7 +265,7 @@
 			compatible = "arm,armv8";
 			reg = <0x0 0x600>;
 			enable-method = "psci";
-			capacity-dmips-mhz = <1740>;
+			capacity-dmips-mhz = <1024>;
 			sched-energy-costs = <&CPU_COST_1 &CLUSTER_COST_1>;
 			cache-size = <0x10000>;
 			next-level-cache = <&L2_600>;
@@ -307,7 +307,7 @@
 			compatible = "arm,armv8";
 			reg = <0x0 0x700>;
 			enable-method = "psci";
-			capacity-dmips-mhz = <1740>;
+			capacity-dmips-mhz = <1024>;
 			sched-energy-costs = <&CPU_COST_1 &CLUSTER_COST_1>;
 			cache-size = <0x10000>;
 			next-level-cache = <&L2_700>;
@@ -384,87 +384,68 @@
 		};
 	};
 
-	energy_costs: energy-costs {
-		compatible = "sched-energy";
+        energy_costs: energy-costs {
+                compatible = "sched-energy";
 
-		CPU_COST_0: core-cost0 {
-			busy-cost-data = <
-				300000	24
-				576000	25
-				748800	31
-				1017600	54
-				1209600	78
-				1363200	105
-				1516800	116
-				1593600	139
-				1708800	168
-				1804800	178
-			>;
-			idle-cost-data = <
-				16 12 8 6
-			>;
-		};
+                CPU_COST_0: core-cost0 {
+                        busy-cost-data = <
+                                 1017600   83
+                                 1248000  100
+                                 1324800  105
+                                 1497600  115
+                                 1612800  121
+                                 1708800  135
+                        >;
+                        idle-cost-data = <
+                                16 12 8 6
+                        >;
+                };
 
-		CPU_COST_1: core-cost1 {
-			busy-cost-data = <
-				300000	180
-				652800	236
-				768000	273
-				979200	446
-				1017600	462
-				1209600	662
-				1363200	894
-				1516800	989
-				1708800	1276
-				1900800	1652
-				2016000	2040
-				2112000	2242
-				2208000	2713
-			>;
-			idle-cost-data = <
-				100 80 60 40
-			>;
-		};
+                CPU_COST_1: core-cost1 {
+                        busy-cost-data = <
+                                  652800  152
+                                  806400  175
+                                  979200  223
+                                 1094400  254
+                                 1209600  277
+                                 1324800  311
+                                 2169600  844
+                                 2208000  862
+                        >;
+                        idle-cost-data = <
+                                100 80 60 40
+                        >;
+                };
 
-		CLUSTER_COST_0: cluster-cost0 {
-			busy-cost-data = <
-				300000	8
-				576000	8
-				748800	9
-				1017600	12
-				1209600	15
-				1363200	18
-				1516800	21
-				1593600	22
-				1708800	23
-				1804800	24
-			>;
-			idle-cost-data = <
-				4 3 2 1
-			>;
-		};
+                CLUSTER_COST_0: cluster-cost0 {
+                        busy-cost-data = <
+                                 1017600   12
+                                 1248000   15
+                                 1324800   18
+                                 1497600   21
+                                 1612800   22
+                                 1708800   23
+                        >;
+                        idle-cost-data = <
+                                4 3 2 1
+                        >;
+                };
 
-		CLUSTER_COST_1: cluster-cost1 {
-			busy-cost-data = <
-				300000	28
-				652800	35
-				768000	36
-				979200	48
-				1017600	59
-				1209600	73
-				1363200	86
-				1516800	88
-				1708800	96
-				1900800	103
-				2016000	107
-				2112000	112
-				2208000	120
-			>;
-			idle-cost-data = <
-				4 3 2 1
-			>;
-		};
-	};
+                CLUSTER_COST_1: cluster-cost1 {
+                        busy-cost-data = <
+                                 652800   35
+                                 806400   36
+                                 979200   48
+                                 1094400   59
+                                 1209600   73
+                                 1324800   86
+                                 2169600  112
+                                 2208000  120
+                        >;
+                        idle-cost-data = <
+                                4 3 2 1
+                        >;
+                };
 
 	psci {
 		compatible = "arm,psci-1.0";
