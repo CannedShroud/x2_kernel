@@ -1638,7 +1638,7 @@ static int swrm_get_logical_dev_num(struct swr_master *mstr, u64 dev_id,
 	swrm_new_slave_config(swrm);
         #ifdef VENDOR_EDIT
         /* Wang.kun@MM.AudioDriver.Machine.2156142, 2019/07/18, add for sound card bind */
-	pr_err("%s: mcp status %x\n", swr_master_read(swrm, SWRM_MCP_STATUS));
+	pr_err("%u: mcp status %x\n", swr_master_read(swrm, SWRM_MCP_STATUS));
 	pr_err("%s: interrupt status %x\n", swr_master_read(swrm, SWRM_INTERRUPT_STATUS));
         #endif /* VENDOR_EDIT */
 	pm_runtime_mark_last_busy(swrm->dev);
