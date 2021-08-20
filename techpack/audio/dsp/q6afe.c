@@ -2394,7 +2394,7 @@ static struct cal_block_data *afe_find_cal(int cal_index, int port_id)
 		/* Ming.Liu@PSW.MM.AudioDriver.Platform, 2019/08/17, add for speaker protection for voip */
 		} else if ((afe_port_index == IDX_AFE_PORT_ID_TERTIARY_MI2S_RX)
 			&& (afe_cal_info->acdb_id == this_afe.dev_acdb_id[afe_port_index])) {
-			pr_debug("%zu: Because afe_port_index is %zu, so cal block is a match, size is %zu\n",
+			pr_debug("%s: Because afe_port_index is %u, so cal block is a match, size is %u\n",
 				__func__, cal_block->cal_data.size);
 			goto exit;
 		#endif
@@ -6242,7 +6242,7 @@ static ssize_t afe_debug_write(struct file *filp,
 	const char __user *ubuf, size_t cnt, loff_t *ppos)
 {
 	char *lb_str = filp->private_data;
-	char lbuf[32];
+	char lbuf[32] = "";
 	int rc;
 	unsigned long param[5];
 
