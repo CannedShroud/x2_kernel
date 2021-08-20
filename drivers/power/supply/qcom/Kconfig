@@ -120,7 +120,7 @@ config SMB1390_CHARGE_PUMP_PSY
 	  SMB1390 is a div2 charge pump capable of delivering 6A charge current
 	  with very high efficiency.
 
-onfig SMB358_CHARGER
+config SMB358_CHARGER
 	tristate "SMB358 Battery Charger"
 	depends on I2C
 	help
